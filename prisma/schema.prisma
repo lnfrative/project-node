@@ -14,13 +14,13 @@ model doctrine_migration_versions {
 }
 
 model summoner {
-  id              Int    @id
-  region          String @db.VarChar(10)
-  summoner_id     String @db.VarChar(255)
-  account_id      String @db.VarChar(255)
-  puuid           String @db.VarChar(255)
-  name            String @db.VarChar(255)
-  profile_icon_id Int
-  revision_date   Int
-  summoner_level  Int
+  id             String   @id
+  region         String
+  summonerId     String
+  accountId      String
+  puuid          String   @unique
+  name           String
+  profileIconId  Int
+  revisionDate   BigInt
+  summonerLevel  Int
 }
