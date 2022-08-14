@@ -38,6 +38,9 @@ export default class SummonersController extends Controller {
             name: summoner.name,
             summonerLevel: summoner.summonerLevel,
             revisionDate: summoner.revisionDate,
+            region: summoner.region,
+            summonerId: summoner.summonerId,
+            accountId: summoner.accountId,
           },
           create: summoner,
         })
