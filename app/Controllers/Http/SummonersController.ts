@@ -21,6 +21,8 @@ export default class SummonersController extends Controller {
 
       const regionsWithoutSummoners = this.getRegionsWithoutSummoner(storedSummoners)
       const fetchedSummoners = await this.fetchSummonersByName(name, regionsWithoutSummoners)
+
+      // TODO: This await delays the response time, it can probably be removed.
       await this.saveSummoners(fetchedSummoners)
 
       data = data.concat(storedSummoners).concat(fetchedSummoners)
