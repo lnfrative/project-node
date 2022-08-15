@@ -3,7 +3,6 @@ import { string } from '@ioc:Adonis/Core/Helpers'
 import Controller from 'App/Controllers/Http/Controller'
 import axios from 'axios'
 import Region from '../../../constants/region'
-import Endpoint from '../../../constants/endpoint'
 import Env from '@ioc:Adonis/Core/Env'
 
 export default class SummonersController extends Controller {
@@ -16,13 +15,12 @@ export default class SummonersController extends Controller {
 
     if (name) {
       const storedSummoners = await this.prisma.summoner.findMany({
-        where: { name: { contains: string.encodeSymbols(name), mode: 'insensitive' } },
+        where: { name: { contains: name, mode: 'insensitive' } },
       })
 
       const regionsWithoutSummoners = this.getRegionsWithoutSummoner(storedSummoners)
       const fetchedSummoners = await this.fetchSummonersByName(name, regionsWithoutSummoners)
 
-      // TODO: This await delays the response time, it can probably be removed.
       await this.saveSummoners(fetchedSummoners)
 
       data = data.concat(storedSummoners).concat(fetchedSummoners)
@@ -31,8 +29,36 @@ export default class SummonersController extends Controller {
     return { content: data }
   }
 
-  private async saveSummoners(summoners: Summoner[]) {
-    await Promise.all(
+  public async show(ctx: HttpContextContract) {
+    let content
+    const { id } = ctx.params
+    const summoner = await this.prisma.summoner.findUnique({ where: { id } })
+
+    if (summoner) {
+      const { revisionDate, summonerLevel, profileIconId } = await this.fetchSummonerByPuuid(
+        summoner.puuid,
+        summoner.region
+      )
+      const refreshedSummoner: Summoner = {
+        ...summoner,
+        profileIconId,
+        revisionDate,
+        summonerLevel,
+      }
+
+      await this.prisma.summoner.update({
+        where: { id },
+        data: refreshedSummoner,
+      })
+
+      content = refreshedSummoner
+    }
+
+    return { content }
+  }
+
+  private saveSummoners(summoners: Summoner[]) {
+    return Promise.all(
       summoners.map(async (summoner) => {
         await this.prisma.summoner.upsert({
           where: { puuid: summoner.puuid },
@@ -51,14 +77,23 @@ export default class SummonersController extends Controller {
   }
 
   private getRegionsWithoutSummoner(summoners: Summoner[]) {
-    const regions = Region.all
-    summoners.forEach((summoner) => regions.splice(regions.indexOf(summoner.region, 1)))
-    return regions
+    const regionsWithSummoners = summoners.map((summoner) => summoner.region)
+    return Region.all.filter((region) => !regionsWithSummoners.includes(region))
+  }
+
+  private async fetchSummonerByPuuid(puuid: string, region: string) {
+    const { data } = await axios({
+      url: this.endpoint.setPuuid(puuid).setRegion(region).generateSummonerByPuuid(),
+      headers: {
+        ['X-Riot-Token']: Env.get('RIOT_API_KEY'),
+      },
+    })
+
+    return data
   }
 
   private async fetchSummonersByName(summonerName: string, regions: string[]) {
-    const endpoint = new Endpoint()
-    endpoint.setSummonerName(summonerName)
+    this.endpoint.setSummonerName(summonerName)
     const summoners = await Promise.all(
       regions.map(async (region) => {
         let content
@@ -66,7 +101,7 @@ export default class SummonersController extends Controller {
           const {
             data: { id, accountId, puuid, name, profileIconId, revisionDate, summonerLevel },
           } = await axios({
-            url: endpoint.setRegion(region).generateSummonerByName(),
+            url: this.endpoint.setRegion(region).generateSummonerByName(),
             headers: {
               ['X-Riot-Token']: Env.get('RIOT_API_KEY'),
             },
