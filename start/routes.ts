@@ -20,8 +20,13 @@
 
 import Route from '@ioc:Adonis/Core/Route'
 
-Route.get('/', async () => {
-  return { hello: 'world' }
-})
-
 Route.resource('api/summoners', 'SummonersController')
+Route.resource('api/records', 'RecordsController')
+
+Route.get('/', async () => {
+  return {
+    message: 'Welcome to the Brøderbund™ Software Library.',
+    artist_name: 'Rez & ArtFluids',
+    product: 'Brøderbund',
+  }
+})
