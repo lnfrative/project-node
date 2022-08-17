@@ -35,14 +35,13 @@ export default class SummonersController extends Controller {
     const summoner = await this.prisma.summoner.findUnique({ where: { id } })
 
     if (summoner) {
-      const { revisionDate, summonerLevel, profileIconId } = await this.fetchSummonerByPuuid(
+      const { summonerLevel, profileIconId } = await this.fetchSummonerByPuuid(
         summoner.puuid,
         summoner.region
       )
       const refreshedSummoner: Summoner = {
         ...summoner,
         profileIconId,
-        revisionDate,
         summonerLevel,
       }
 
@@ -65,7 +64,6 @@ export default class SummonersController extends Controller {
           update: {
             name: summoner.name,
             summonerLevel: summoner.summonerLevel,
-            revisionDate: summoner.revisionDate,
             region: summoner.region,
             summonerId: summoner.summonerId,
             accountId: summoner.accountId,
@@ -99,7 +97,7 @@ export default class SummonersController extends Controller {
         let content
         try {
           const {
-            data: { id, accountId, puuid, name, profileIconId, revisionDate, summonerLevel },
+            data: { id, accountId, puuid, name, profileIconId, summonerLevel },
           } = await axios({
             url: this.endpoint.setRegion(region).generateSummonerByName(),
             headers: {
@@ -115,7 +113,6 @@ export default class SummonersController extends Controller {
             puuid,
             name,
             profileIconId,
-            revisionDate,
             summonerLevel,
           }
         } catch (e) {

@@ -6,6 +6,6 @@ interface Summoner {
   puuid: string
   name: string
   profileIconId: number
-  revisionDate: bigint
   summonerLevel: number
+  creationDate: Date
 }

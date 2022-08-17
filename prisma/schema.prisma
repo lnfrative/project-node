@@ -21,6 +21,6 @@ model summoner {
   puuid          String   @unique
   name           String
   profileIconId  Int
-  revisionDate   BigInt
   summonerLevel  Int
+  creationDate   DateTime   @default(now())
 }
