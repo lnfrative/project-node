@@ -22,13 +22,22 @@ model summoner {
   name           String
   profileIconId  Int
   summonerLevel  Int
-  matches        matchParticipant[]
   creationDate   DateTime   @default(now())
+  matches        matchParticipant[]
+  playeds        played[]
+}
+
+model match {
+  id             String   @id
+  version        String
+  mode           String
+  creationDate   DateTime
+  duration       Int
+  participants   matchParticipant[]
 }
 
 model matchParticipant {
   id             String   @id
-  summoner       summoner @relation(fields: [summonerId], references: [id])
   summonerId     String
   matchId        String   @unique
   win            Boolean
@@ -36,17 +45,26 @@ model matchParticipant {
   championName   String
   role           String
   match          match @relation(fields: [matchId], references: [id])
+  summoner       summoner @relation(fields: [summonerId], references: [id])
 }
 
-model match {
+model played {
   id             String   @id
-  participants   matchParticipant[]
-  version        String
+  summonerId     String
   mode           String
-  creationDate   DateTime
-  duration       Int
+  version        String
+  total          Int
+  losses         Int
+  champions      playedChampion[]
+  summoner       summoner @relation(fields: [summonerId], references: [id])
 }
 
-
-
+model playedChampion {
+  id             String   @id
+  playedId       String
+  championName   String
+  total          Int
+  losses         Int
+  played         played @relation(fields: [playedId], references: [id])
+}
 
