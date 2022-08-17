@@ -1,7 +1,7 @@
 interface Summoner {
   id: string
   region: string
-  summonerId: string
+  playerId: string
   accountId: string
   puuid: string
   name: string

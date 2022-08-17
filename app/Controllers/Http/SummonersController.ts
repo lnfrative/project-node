@@ -65,7 +65,7 @@ export default class SummonersController extends Controller {
             name: summoner.name,
             summonerLevel: summoner.summonerLevel,
             region: summoner.region,
-            summonerId: summoner.summonerId,
+            playerId: summoner.playerId,
             accountId: summoner.accountId,
           },
           create: summoner,
@@ -108,7 +108,7 @@ export default class SummonersController extends Controller {
           content = {
             id: string.generateRandom(15),
             region,
-            summonerId: id,
+            playerId: id,
             accountId,
             puuid,
             name,

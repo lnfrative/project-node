@@ -16,11 +16,37 @@ model doctrine_migration_versions {
 model summoner {
   id             String   @id
   region         String
-  summonerId     String
+  playerId       String
   accountId      String
   puuid          String   @unique
   name           String
   profileIconId  Int
   summonerLevel  Int
+  matches        matchParticipant[]
   creationDate   DateTime   @default(now())
 }
+
+model matchParticipant {
+  id             String   @id
+  summoner       summoner @relation(fields: [summonerId], references: [id])
+  summonerId     String
+  matchId        String   @unique
+  win            Boolean
+  score          Int
+  championName   String
+  role           String
+  match          match @relation(fields: [matchId], references: [id])
+}
+
+model match {
+  id             String   @id
+  participants   matchParticipant[]
+  version        String
+  mode           String
+  creationDate   DateTime
+  duration       Int
+}
+
+
+
+
