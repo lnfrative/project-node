@@ -63,6 +63,7 @@ model playedChampion {
   id             String   @id
   playedId       String
   championName   String
+  score          Int
   total          Int
   losses         Int
   played         played @relation(fields: [playedId], references: [id])
