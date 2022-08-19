@@ -31,26 +31,46 @@ export default class SummonersController extends Controller {
 
   public async show(ctx: HttpContextContract) {
     let content
+
+    const qs = ctx.request.qs()
     const { id } = ctx.params
-    const summoner = await this.prisma.summoner.findUnique({ where: { id } })
+    const include = {
+      matches: qs.matches === 'true',
+      playeds: qs.playeds === 'true',
+      playedChampions: qs.playedChampions === 'true',
+    }
+
+    const summoner = await this.prisma.summoner.findUnique({
+      where: { id },
+      include: {
+        matches: include.matches,
+        playeds: include.playeds && {
+          include: {
+            champions: include.playedChampions,
+          },
+        },
+      },
+    })
 
     if (summoner) {
       const { summonerLevel, profileIconId } = await this.fetchSummonerByPuuid(
         summoner.puuid,
         summoner.region
       )
-      const refreshedSummoner: Summoner = {
+
+      await this.prisma.summoner.update({
+        where: { id },
+        data: {
+          summonerLevel,
+          profileIconId,
+        },
+      })
+
+      content = {
         ...summoner,
         profileIconId,
         summonerLevel,
       }
-
-      await this.prisma.summoner.update({
-        where: { id },
-        data: refreshedSummoner,
-      })
-
-      content = refreshedSummoner
     }
 
     return { content }
