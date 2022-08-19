@@ -3,7 +3,6 @@ import { string } from '@ioc:Adonis/Core/Helpers'
 import Controller from 'App/Controllers/Http/Controller'
 import axios from 'axios'
 import Region from '../../../constants/region'
-import Env from '@ioc:Adonis/Core/Env'
 
 export default class SummonersController extends Controller {
   public async index(ctx: HttpContextContract) {
@@ -100,12 +99,9 @@ export default class SummonersController extends Controller {
   }
 
   private async fetchSummonerByPuuid(puuid: string, region: string) {
-    const { data } = await axios({
-      url: this.endpoint.setPuuid(puuid).setRegion(region).generateSummonerByPuuid(),
-      headers: {
-        ['X-Riot-Token']: Env.get('RIOT_API_KEY'),
-      },
-    })
+    const { data } = await axios(
+      this.endpoint.setPuuid(puuid).setRegion(region).generateSummonerByPuuid()
+    )
 
     return data
   }
@@ -118,12 +114,7 @@ export default class SummonersController extends Controller {
         try {
           const {
             data: { id, accountId, puuid, name, profileIconId, summonerLevel },
-          } = await axios({
-            url: this.endpoint.setRegion(region).generateSummonerByName(),
-            headers: {
-              ['X-Riot-Token']: Env.get('RIOT_API_KEY'),
-            },
-          })
+          } = await axios(this.endpoint.setRegion(region).generateSummonerByName())
 
           content = {
             id: string.generateRandom(15),

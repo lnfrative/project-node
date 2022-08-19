@@ -1,3 +1,6 @@
+import { AxiosRequestConfig } from 'axios'
+import Env from '@ioc:Adonis/Core/Env'
+
 export default class Endpoint {
   private SUMMONER_BY_NAME =
     'https://{region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/{summonerName}'
@@ -7,22 +10,33 @@ export default class Endpoint {
   protected _summonerName: string
   protected _puuid: string
 
-  public generateSummonerByName(): string {
-    return encodeURI(
+  public generateSummonerByName(): AxiosRequestConfig {
+    const url = encodeURI(
       this.SUMMONER_BY_NAME.replace('{region}', this._region).replace(
         '{summonerName}',
         this._summonerName
       )
     )
+
+    return {
+      url,
+      headers: {
+        ['X-Riot-Token']: Env.get('RIOT_API_KEY'),
+      },
+    }
   }
 
-  public generateSummonerByPuuid(): string {
-    return encodeURI(
-      this.SUMMONER_BY_PUUID.replace('{region}', this._region).replace(
-        '{puuid}',
-        this._puuid,
-      )
+  public generateSummonerByPuuid(): AxiosRequestConfig {
+    const url = encodeURI(
+      this.SUMMONER_BY_PUUID.replace('{region}', this._region).replace('{puuid}', this._puuid)
     )
+
+    return {
+      url,
+      headers: {
+        ['X-Riot-Token']: Env.get('RIOT_API_KEY'),
+      },
+    }
   }
 
   public setPuuid(puuid: string): this {
