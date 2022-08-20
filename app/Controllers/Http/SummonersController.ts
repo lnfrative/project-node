@@ -1,7 +1,6 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { string } from '@ioc:Adonis/Core/Helpers'
 import Controller from 'App/Controllers/Http/Controller'
-import axios from 'axios'
 import Region from '../../../constants/region'
 
 export default class SummonersController extends Controller {
@@ -52,10 +51,10 @@ export default class SummonersController extends Controller {
     })
 
     if (summoner) {
-      const { summonerLevel, profileIconId } = await this.fetchSummonerByPuuid(
-        summoner.puuid,
-        summoner.region
-      )
+      const { summonerLevel, profileIconId } = await this.fetch
+        .setRegion(summoner.region)
+        .setPuuid(summoner.puuid)
+        .summonerByPuuid()
 
       await this.prisma.summoner.update({
         where: { id },
@@ -98,23 +97,15 @@ export default class SummonersController extends Controller {
     return Region.all.filter((region) => !regionsWithSummoners.includes(region))
   }
 
-  private async fetchSummonerByPuuid(puuid: string, region: string) {
-    const { data } = await axios(
-      this.endpoint.setPuuid(puuid).setRegion(region).generateSummonerByPuuid()
-    )
-
-    return data
-  }
-
   private async fetchSummonersByName(summonerName: string, regions: string[]) {
-    this.endpoint.setSummonerName(summonerName)
+    this.fetch.setSummonerName(summonerName)
     const summoners = await Promise.all(
       regions.map(async (region) => {
         let content
         try {
-          const {
-            data: { id, accountId, puuid, name, profileIconId, summonerLevel },
-          } = await axios(this.endpoint.setRegion(region).generateSummonerByName())
+          const { id, accountId, puuid, name, profileIconId, summonerLevel } = await this.fetch
+            .setRegion(region)
+            .summonerByName()
 
           content = {
             id: string.generateRandom(15),

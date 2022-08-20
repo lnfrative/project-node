@@ -1,11 +1,11 @@
 import { PrismaClient } from '@prisma/client'
-import Endpoint from '../../../constants/endpoint'
+import Fetch from '../../../constants/Fetch'
 
 export default class Controller {
   protected prisma: PrismaClient
-  protected endpoint: Endpoint
+  protected fetch: Fetch
   constructor() {
-    this.endpoint = new Endpoint()
+    this.fetch = new Fetch()
     this.prisma = new PrismaClient()
   }
 }

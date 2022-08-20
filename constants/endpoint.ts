@@ -18,7 +18,7 @@ export default class Endpoint {
   protected _start: string = '0'
   protected _count: string = '20'
 
-  public generateSummonerByName(): AxiosRequestConfig {
+  protected generateSummonerByName(): AxiosRequestConfig {
     const url = encodeURI(
       this.SUMMONER_BY_NAME.replace('{region}', this._region).replace(
         '{summonerName}',
@@ -34,7 +34,7 @@ export default class Endpoint {
     }
   }
 
-  public generateSummonerByPuuid(): AxiosRequestConfig {
+  protected generateSummonerByPuuid(): AxiosRequestConfig {
     const url = encodeURI(
       this.SUMMONER_BY_PUUID.replace('{region}', this._region).replace('{puuid}', this._puuid)
     )
@@ -47,7 +47,7 @@ export default class Endpoint {
     }
   }
 
-  public generateMatchById(): AxiosRequestConfig {
+  protected generateMatchById(): AxiosRequestConfig {
     const url = encodeURI(
       this.MATCH_BY_ID.replace('{regionGroup}', this._regionGroup).replace(
         '{matchId}',
@@ -63,7 +63,7 @@ export default class Endpoint {
     }
   }
 
-  public generateMatchesByPuuid(): AxiosRequestConfig {
+  protected generateMatchesByPuuid(): AxiosRequestConfig {
     const url = encodeURI(
       this.MATCHES_BY_PUUID.replace('{regionGroup}', this._regionGroup)
         .replace('{puuid}', this._puuid)
