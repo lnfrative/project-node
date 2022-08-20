@@ -9,10 +9,12 @@ export default class Endpoint {
     'https://{region}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}'
   private MATCHES_BY_PUUID =
     'https://{regionGroup}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start={start}&count={count}'
+  private MATCH_BY_ID = 'https://{regionGroup}.api.riotgames.com/lol/match/v5/matches/{matchId}'
   protected _region: string
   protected _summonerName: string
   protected _puuid: string
   protected _regionGroup: string
+  protected _matchId: string
   protected _start: string = '0'
   protected _count: string = '20'
 
@@ -45,6 +47,22 @@ export default class Endpoint {
     }
   }
 
+  public generateMatchById(): AxiosRequestConfig {
+    const url = encodeURI(
+      this.MATCH_BY_ID.replace('{regionGroup}', this._regionGroup).replace(
+        '{matchId}',
+        this._matchId
+      )
+    )
+
+    return {
+      url,
+      headers: {
+        ['X-Riot-Token']: Env.get('RIOT_API_KEY'),
+      },
+    }
+  }
+
   public generateMatchesByPuuid(): AxiosRequestConfig {
     const url = encodeURI(
       this.MATCHES_BY_PUUID.replace('{regionGroup}', this._regionGroup)
@@ -59,6 +77,11 @@ export default class Endpoint {
         ['X-Riot-Token']: Env.get('RIOT_API_KEY'),
       },
     }
+  }
+
+  public setMatchId(matchId: string): this {
+    this._matchId = matchId
+    return this
   }
 
   public setCount(count: string): this {
