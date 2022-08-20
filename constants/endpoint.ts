@@ -1,4 +1,5 @@
 import { AxiosRequestConfig } from 'axios'
+import Region from './region'
 import Env from '@ioc:Adonis/Core/Env'
 
 export default class Endpoint {
@@ -6,9 +7,14 @@ export default class Endpoint {
     'https://{region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/{summonerName}'
   private SUMMONER_BY_PUUID =
     'https://{region}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}'
+  private MATCHES_BY_PUUID =
+    'https://{regionGroup}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start={start}&count={count}'
   protected _region: string
   protected _summonerName: string
   protected _puuid: string
+  protected _regionGroup: string
+  protected _start: string = '0'
+  protected _count: string = '20'
 
   public generateSummonerByName(): AxiosRequestConfig {
     const url = encodeURI(
@@ -39,6 +45,32 @@ export default class Endpoint {
     }
   }
 
+  public generateMatchesByPuuid(): AxiosRequestConfig {
+    const url = encodeURI(
+      this.MATCHES_BY_PUUID.replace('{regionGroup}', this._regionGroup)
+        .replace('{puuid}', this._puuid)
+        .replace('{count}', this._count)
+        .replace('{start}', this._start)
+    )
+
+    return {
+      url,
+      headers: {
+        ['X-Riot-Token']: Env.get('RIOT_API_KEY'),
+      },
+    }
+  }
+
+  public setCount(count: string): this {
+    this._count = count
+    return this
+  }
+
+  public setStart(start: string): this {
+    this._start = start
+    return this
+  }
+
   public setPuuid(puuid: string): this {
     this._puuid = puuid
     return this
@@ -51,6 +83,7 @@ export default class Endpoint {
 
   public setRegion(region: string): this {
     this._region = region
+    this._regionGroup = Region.continents[region]
     return this
   }
 }
