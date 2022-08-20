@@ -12,4 +12,14 @@ export default class Fetch extends Endpoint {
     const { data } = await axios(this.generateSummonerByPuuid())
     return data
   }
+
+  public async matchById(): Promise<any> {
+    const { data } = await axios(this.generateMatchById())
+    return data
+  }
+
+  public async matchesByPuuid(): Promise<any> {
+    const { data } = await axios(this.generateMatchesByPuuid())
+    return data
+  }
 }
